@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import classes from "./EventForm.module.css";
+import { getAuthToken } from "../util/AuthUtil";
 
 function EventForm({ method, event }) {
   const data = useActionData();
@@ -35,6 +36,7 @@ function EventForm({ method, event }) {
           id="title"
           type="text"
           name="title"
+          required
           defaultValue={event ? event.title : ""}
         />
       </p>
@@ -44,6 +46,7 @@ function EventForm({ method, event }) {
           id="image"
           type="url"
           name="image"
+          required
           defaultValue={event ? event.image : ""}
         />
       </p>
@@ -53,6 +56,7 @@ function EventForm({ method, event }) {
           id="date"
           type="date"
           name="date"
+          required
           defaultValue={event ? event.date : ""}
         />
       </p>
@@ -62,6 +66,7 @@ function EventForm({ method, event }) {
           id="description"
           name="description"
           rows="5"
+          required
           defaultValue={event ? event.description : ""}
         />
       </p>
@@ -80,6 +85,11 @@ function EventForm({ method, event }) {
 export default EventForm;
 
 export const action = async ({ request, params }) => {
+  const token = getAuthToken();
+
+  if ((token && token.length > 0 ? true : false) === false) {
+    return redirect("/auth");
+  }
   const method = request.method;
   const id = params.id;
   const data = await request.formData();
@@ -95,7 +105,10 @@ export const action = async ({ request, params }) => {
     `http://localhost:8080/events${method === "PATCH" ? "/" + id : ""}`,
     {
       method: method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
       body: JSON.stringify(event),
     },
   );

@@ -1,5 +1,6 @@
 import EventsList from "../../components/EventsList";
-import { useLoaderData } from "react-router-dom";
+import { redirect, useLoaderData } from "react-router-dom";
+import { getAuthToken } from "../../util/AuthUtil";
 
 const EventsPage = () => {
   const data = useLoaderData();
@@ -11,6 +12,11 @@ const EventsPage = () => {
 export default EventsPage;
 
 export const loader = async () => {
+  const token = getAuthToken();
+  if ((token && token.length > 0 ? true : false) === false) {
+    redirect("/auth");
+  }
+
   const response = await fetch("http://localhost:8080/events");
 
   if (!response.ok) {

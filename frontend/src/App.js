@@ -10,18 +10,35 @@ import EditEventPage from "./pages/events/EditEvent";
 import RootLayout from "./pages/Root";
 import RootEventsLayout from "./pages/events/RootEvents";
 import ErrorPage from "./pages/Error";
+import NewsletterPage, { action as newsletterAction } from "./pages/Newsletter";
+import AuthenticationPage, {
+  action as authAction,
+} from "./pages/auth/Authentication";
+import { action as logoutAction } from "./pages/auth/Logout";
 
 import { action as updateEventAction } from "./components/EventForm";
+import { getAuthToken } from "./util/AuthUtil";
 
 const router = createBrowserRouter([
   {
+    id: "root",
     path: "/",
+    loader: getAuthToken,
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: "/auth",
+        element: <AuthenticationPage />,
+        action: authAction,
+      },
+      {
+        path: "/logout",
+        action: logoutAction,
       },
       {
         path: "events",
@@ -36,7 +53,6 @@ const router = createBrowserRouter([
             path: ":id",
             id: "event-detail",
             loader: EventDetailLoader,
-
             children: [
               {
                 index: true,
@@ -56,6 +72,11 @@ const router = createBrowserRouter([
             action: updateEventAction,
           },
         ],
+      },
+      {
+        path: "newsletter",
+        element: <NewsletterPage />,
+        action: newsletterAction,
       },
     ],
   },
